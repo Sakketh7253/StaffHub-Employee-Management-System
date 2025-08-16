@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-plus me-2"></i>Add New User Account
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">Username *</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="username" name="username" 
+                                       placeholder="Enter unique username" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">Password *</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       placeholder="Enter secure password" required>
+                                <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="full_name" class="form-label">Full Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                                <input type="text" class="form-control" id="full_name" name="full_name" 
+                                       placeholder="Enter full name">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       placeholder="user@staffhub.com">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="role" class="form-label">User Role *</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="">Select Role...</option>
+                                <option value="employee">Employee (Read-only access)</option>
+                                <option value="manager">Manager (View & Edit employees)</option>
+                                <option value="hr">HR Manager (Full employee management)</option>
+                                {% if current_user.role == 'admin' %}
+                                <option value="admin">Admin (Full system access)</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <small class="text-muted">Choose the appropriate role for this user</small>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Role Permissions:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Employee:</strong> View employee directory only</li>
+                            <li><strong>Manager:</strong> View and edit employee information</li>
+                            <li><strong>HR Manager:</strong> Full employee management + user account management</li>
+                            {% if current_user.can_manage_users() %}
+                            <li><strong>Admin:</strong> Complete system administration</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-user-plus me-1"></i>Create Account
+                            </button>
+                            <a href="{{ url_for('manage_users') }}" class="btn btn-secondary ms-2">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle password visibility
+document.getElementById('togglePassword').addEventListener('click', function () {
+    const password = document.getElementById('password');
+    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+    password.setAttribute('type', type);
+    
+    // Toggle the icon
+    const icon = this.querySelector('i');
+    icon.classList.toggle('fa-eye');
+    icon.classList.toggle('fa-eye-slash');
+});
+
+// Role selection helper
+document.getElementById('role').addEventListener('change', function () {
+    const selectedRole = this.value;
+    const helpText = document.querySelector('.text-muted');
+    
+    const roleDescriptions = {
+        'employee': 'This user will have read-only access to the employee directory.',
+        'manager': 'This user can view and edit employee information but cannot delete records.',
+        'hr': 'This user can manage all employee records and user accounts.',
+        'admin': 'This user has complete system administration privileges.'
+    };
+    
+    if (roleDescriptions[selectedRole]) {
+        helpText.textContent = roleDescriptions[selectedRole];
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+    <h2>Edit Employee</h2>
+    <form method="POST">
+        <input type="text" name="name" value="{{ employee.name }}" placeholder="Full Name" required>
+        <input type="email" name="email" value="{{ employee.email }}" placeholder="Email Address" required>
+        <select name="department" required>
+            <option value="">Select Department</option>
+            <option value="Human Resources" {% if employee.department == 'Human Resources' %}selected{% endif %}>Human Resources</option>
+            <option value="Information Technology" {% if employee.department == 'Information Technology' %}selected{% endif %}>Information Technology</option>
+            <option value="Finance" {% if employee.department == 'Finance' %}selected{% endif %}>Finance</option>
+            <option value="Marketing" {% if employee.department == 'Marketing' %}selected{% endif %}>Marketing</option>
+            <option value="Sales" {% if employee.department == 'Sales' %}selected{% endif %}>Sales</option>
+            <option value="Operations" {% if employee.department == 'Operations' %}selected{% endif %}>Operations</option>
+            <option value="Customer Service" {% if employee.department == 'Customer Service' %}selected{% endif %}>Customer Service</option>
+            <option value="Research & Development" {% if employee.department == 'Research & Development' %}selected{% endif %}>Research & Development</option>
+            <option value="{{ employee.department }}" {% if employee.department not in ['Human Resources', 'Information Technology', 'Finance', 'Marketing', 'Sales', 'Operations', 'Customer Service', 'Research & Development'] %}selected{% endif %}>{{ employee.department }}</option>
+        </select>
+        <input type="text" name="position" value="{{ employee.position }}" placeholder="Job Position" required>
+        <input type="number" name="salary" value="{{ employee.salary }}" placeholder="Annual Salary" min="0" step="0.01" required>
+        <button type="submit">Update Employee</button>
+    </form>
+    <div style="text-align: center; margin-top: 1rem;">
+        <a href="{{ url_for('index') }}" class="btn-secondary">Cancel</a>
+    </div>
+</div>
+{% endblock %}

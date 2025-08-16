@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-edit me-2"></i>Edit User Account: {{ user.username }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">Username *</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="username" name="username" 
+                                       value="{{ user.username }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="full_name" class="form-label">Full Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                                <input type="text" class="form-control" id="full_name" name="full_name" 
+                                       value="{{ user.full_name or '' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ user.email or '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="role" class="form-label">Role</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+                                <select class="form-select" id="role" name="role" 
+                                        {% if not current_user.role == 'admin' %}disabled{% endif %}>
+                                    <option value="employee" {% if user.role == 'employee' %}selected{% endif %}>Employee</option>
+                                    <option value="manager" {% if user.role == 'manager' %}selected{% endif %}>Manager</option>
+                                    <option value="hr" {% if user.role == 'hr' %}selected{% endif %}>HR Manager</option>
+                                    {% if current_user.role == 'admin' %}
+                                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                                    {% elif user.role == 'admin' %}
+                                    <option value="admin" selected disabled>Admin (Protected)</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                            {% if not current_user.role == 'admin' %}
+                            <small class="text-muted">Only Admins can change roles</small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">New Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Leave blank to keep current password">
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">Leave blank if you don't want to change the password</small>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Current Account:</strong> {{ user.username }} | 
+                        <strong>Role:</strong> {{ user.role.title() }} |
+                        <strong>Status:</strong> {{ 'Active' if user.is_active else 'Inactive' }}
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-1"></i>Update Account
+                            </button>
+                            <a href="{{ url_for('manage_users') }}" class="btn btn-secondary ms-2">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                        </div>
+                        {% if user.id == current_user.id %}
+                        <div>
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-exclamation-triangle me-1"></i>You are editing your own account
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle password visibility
+document.getElementById('togglePassword').addEventListener('click', function () {
+    const password = document.getElementById('password');
+    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+    password.setAttribute('type', type);
+    
+    // Toggle the icon
+    const icon = this.querySelector('i');
+    icon.classList.toggle('fa-eye');
+    icon.classList.toggle('fa-eye-slash');
+});
+</script>
+
+{% endblock %}

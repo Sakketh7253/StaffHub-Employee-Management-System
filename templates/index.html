@@ -1,0 +1,202 @@
+﻿{% extends "base.html" %}
+{% block content %}
+
+<!-- Dashboard Header -->
+<div class="row align-items-center mb-4">
+    <div class="col-12 text-center mb-3">
+        <h2 class="text-primary mb-3">
+            <i class="fas fa-tachometer-alt me-2"></i>Enterprise Dashboard
+        </h2>
+        <p class="text-muted mb-0 mt-2">Welcome back, {{ current_user.full_name or current_user.username }}! | Role: <span class="badge bg-primary">{{ current_user.role.title() }}</span></p>
+    </div>
+    {% if current_user.can_create_employees() %}
+    <div class="col-12 text-center">
+        <a href="{{ url_for('add_employee') }}" class="btn btn-success btn-lg">
+            <i class="fas fa-plus me-1"></i>Add Employee
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Performance Metrics Card -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-light border-0 shadow-sm">
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="metric">
+                            <h3 class="text-primary mb-0">{{ total_employees }}</h3>
+                            <small class="text-muted">Total Employees</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric">
+                            <h3 class="text-success mb-0">{{ employees.total }}</h3>
+                            <small class="text-muted">Filtered Results</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric">
+                            <h3 class="text-info mb-0">{{ "%.3f"|format(query_time) }}s</h3>
+                            <small class="text-muted">Query Time</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric">
+                            <h3 class="text-warning mb-0">{{ employees.pages }}</h3>
+                            <small class="text-muted">Total Pages</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search and Filter Controls -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Search Employees</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Name, email, or position...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Filter by Department</label>
+                <select class="form-select" name="department">
+                    <option value="">All Departments</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept }}" {% if department_filter == dept %}selected{% endif %}>{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="fas fa-filter me-1"></i>Filter
+                </button>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-refresh me-1"></i>Clear
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Employee Table -->
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-users me-2"></i>Employee Directory
+            <span class="badge bg-light text-primary ms-2">Page {{ employees.page }} of {{ employees.pages }}</span>
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th><i class="fas fa-user me-1"></i>Name</th>
+                        <th><i class="fas fa-envelope me-1"></i>Email</th>
+                        <th><i class="fas fa-building me-1"></i>Department</th>
+                        <th><i class="fas fa-briefcase me-1"></i>Position</th>
+                        {% if current_user.can_view_salaries() %}
+                        <th><i class="fas fa-dollar-sign me-1"></i>Salary</th>
+                        {% endif %}
+                        <th><i class="fas fa-cog me-1"></i>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in employees.items %}
+                    <tr>
+                        <td class="fw-medium">{{ emp.name }}</td>
+                        <td>{{ emp.email }}</td>
+                        <td><span class="badge bg-secondary">{{ emp.department }}</span></td>
+                        <td>{{ emp.position }}</td>
+                        {% if current_user.can_view_salaries() %}
+                        <td class="fw-bold text-success">${{ "{:,.2f}".format(emp.salary) }}</td>
+                        {% endif %}
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                {% if current_user.can_edit_employees() %}
+                                <a href="{{ url_for('edit_employee', id=emp.id) }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% endif %}
+                                {% if current_user.can_delete_employees() %}
+                                <form method="POST" action="{{ url_for('delete_employee', id=emp.id) }}" style="display:inline;" 
+                                      onsubmit="return confirm('⚠️ Are you sure you want to delete {{ emp.name }}?');">
+                                    <button type="submit" class="btn btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="{% if current_user.can_view_salaries() %}6{% else %}5{% endif %}" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-users fa-3x mb-3"></i>
+                                <h5>No employees found</h5>
+                                {% if current_user.can_create_employees() %}
+                                <p>Get started by <a href="{{ url_for('add_employee') }}" class="text-decoration-none">adding the first employee</a></p>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if employees.pages > 1 %}
+<div class="d-flex justify-content-center mt-4">
+    <nav aria-label="Employee pagination">
+        <ul class="pagination">
+            {% if employees.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('index', page=employees.prev_num, search=search, department=department_filter) }}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for page_num in employees.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num != employees.page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('index', page=page_num, search=search, department=department_filter) }}">{{ page_num }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                    {% endif %}
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if employees.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('index', page=employees.next_num, search=search, department=department_filter) }}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+
+{% endblock %}
