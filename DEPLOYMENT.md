@@ -97,7 +97,7 @@ git add .
 git commit -m "Initial commit"
 
 # 2. Create GitHub repository and push
-git remote add origin https://github.com/SakkethRao/StaffHub.git
+git remote add origin https://github.com/Sakketh7253/StaffHub.git
 git branch -M main
 git push -u origin main
 

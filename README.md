@@ -102,7 +102,7 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/SakkethRao/StaffHub.git
+   git clone https://github.com/Sakketh7253/StaffHub.git
    cd StaffHub
    ```
 
@@ -312,7 +312,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, feel free to reach out via email or create an issue on GitHub for any questions or feature requests.
+For support or project inquiries, feel free to reach out at sakkethraojuvvadi7253@gmail.com or create an issue on GitHub.
 
 ---
 
