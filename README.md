@@ -102,8 +102,8 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Sakketh7253/StaffHub.git
-   cd StaffHub
+   git clone https://github.com/Sakketh7253/StaffHub-Employee-Management-System.git
+   cd StaffHub-Employee-Management-System
    ```
 
 2. **Create virtual environment**

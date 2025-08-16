@@ -3,8 +3,20 @@
 ## 🚀 Deployment Options
 
 ### 1. Render (Recommended) - Free & Easy
+# 3. Deploy to Render (after connecting to GitHub)
+# Just click deploy in Render dashboard!
+```
 
-**Why Render?**
+## 🎯 Recommended: Render Deployment
+
+Render is the best choice for your StaffHub project because:
+- **Free tier** perfect for portfolio projects
+- **Automatic deployments** on git push
+- **Built-in PostgreSQL** database
+- **HTTPS by default**
+- **Easy scaling** when needed
+
+Your app will be live at: `https://staffhub-sakketh.onrender.com`**
 - ✅ Free tier available
 - ✅ Automatic HTTPS
 - ✅ Git-based deployments
@@ -97,7 +109,7 @@ git add .
 git commit -m "Initial commit"
 
 # 2. Create GitHub repository and push
-git remote add origin https://github.com/Sakketh7253/StaffHub.git
+git remote add origin https://github.com/Sakketh7253/StaffHub-Employee-Management-System.git
 git branch -M main
 git push -u origin main
 
